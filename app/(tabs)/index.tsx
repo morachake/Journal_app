@@ -1,10 +1,14 @@
+import Calendar from '@/components/home/Calendar';
+import NavBar from '@/components/home/NavBar';
 import { Image, StyleSheet, Platform, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   return (
     <SafeAreaView>
-      <Text>Home</Text>
+      
+      <NavBar/>
+      <Calendar/>
     </SafeAreaView>
   );
 }

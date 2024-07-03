@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-
+import { Entypo ,Ionicons} from '@expo/vector-icons';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -17,9 +17,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Journal',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+            <TabBarIcon name={'book-outline'} color={color} />
           ),
         }}
       />
@@ -28,19 +28,19 @@ export default function TabLayout() {
         options={{
           title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <Ionicons name="add-circle-outline" size={28} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'profile',
+          title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <Entypo name={'user'} size={28} color={color} />
           ),
         }}
-        />
+      />
     </Tabs>
   );
 }

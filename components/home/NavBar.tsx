@@ -3,7 +3,7 @@ import { AntDesign } from '@expo/vector-icons';
 export default function NavBar() {
     return (
         <View style={styles.container}>
-            <Text>Journal</Text>
+            <Text style={{color:"#FFFF",fontSize:18}}>Journal</Text>
             <View style={styles.cards}>
                 <TouchableOpacity style={styles.card}>
                     <Text>Day</Text>

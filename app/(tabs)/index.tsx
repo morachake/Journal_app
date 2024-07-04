@@ -1,14 +1,19 @@
 import Calendar from '@/components/home/Calendar';
+import Journal from '@/components/home/Journal';
 import NavBar from '@/components/home/NavBar';
-import { Image, StyleSheet, Platform, Text } from 'react-native';
+import { Image, StyleSheet, Platform, Text, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   return (
     <SafeAreaView>
-      
       <NavBar/>
-      <Calendar/>
+      <ScrollView>
+          {/* <Calendar/> */}
+          <View style={styles.container}>
+            <Journal/>
+          </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -23,11 +28,18 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  container:{
+    justifyContent:'center',
+    alignItems:'center',
+    padding: 3,
+    marginTop: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  }
 });

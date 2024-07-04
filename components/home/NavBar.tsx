@@ -11,6 +11,9 @@ export default function NavBar() {
                 <TouchableOpacity style={styles.card}>
                     <Text>Week</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.card}>
+                    <Text>Month</Text>
+                </TouchableOpacity>
                
             </View>
             <View style={styles.filter}>
@@ -30,7 +33,7 @@ const styles = StyleSheet.create({
         height: 56,
     },
     cards:{
-        width: 150,
+        width: 200,
         padding: 5,
         flexDirection: 'row',
         gap: 3,

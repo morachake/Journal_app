@@ -4,8 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FloatingAction } from 'react-native-floating-action';
 import { Ionicons } from '@expo/vector-icons';
 import NavBar from '@/components/home/NavBar';
-import AddJournalModal from '@/components/AddJournalModal';
-import AddCategoryModal from '@/components/AddCategoryModal';
+import AddJournalModal from '@/components/home/AddJournalModal';
+import AddCategoryModal from '@/components/home/AddCategoryModal';
 import Journal from '@/components/home/Journal';
 
 interface JournalEntry {

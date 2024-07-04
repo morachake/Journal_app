@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
 import JournalItem from './JournalItem';
-import AddJournalModal from '../AddJournalModal';
+import AddJournalModal from './AddJournalModal';
 
 const Journal: React.FC = () => {
   const [expandedId, setExpandedId] = useState<number | null>(null);

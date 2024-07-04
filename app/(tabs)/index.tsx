@@ -13,6 +13,8 @@ interface JournalEntry {
   content: string;
   category: string;
   date: string;
+  onPressItem : () => void;
+  onSave:  () => void;
 }
 
 const actions = [

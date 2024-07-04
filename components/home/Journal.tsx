@@ -1,53 +1,26 @@
+
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
-import { EvilIcons, Ionicons } from '@expo/vector-icons';
-
-interface JournalItemProps {
-  id: number;
-  title: string;
-  content: string;
-  category: string;
-  date: string;
-  expanded: boolean;
-  onToggleExpand: (id: number) => void;
-}
-
-const JournalItem: React.FC<JournalItemProps> = ({ id, title, content, category, date, expanded, onToggleExpand }) => {
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <EvilIcons name="calendar" size={24} color="#FF5987" style={styles.icon} />
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.dayText}>{category}</Text>
-          <Text style={styles.dateText}>{date}</Text>
-        </View>
-        <TouchableOpacity onPress={() => onToggleExpand(id)} style={styles.expandButton}>
-          <Ionicons
-            name={expanded ? "chevron-up" : "chevron-down"}
-            size={24}
-            color="#FF5987"
-          />
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.body}>
-        <Text style={styles.journalTitle}>{title}</Text>
-        <Text
-          style={styles.journalContent}
-          numberOfLines={expanded ? undefined : 2}
-        >
-          {content}
-        </Text>
-      </View>
-    </View>
-  );
-};
+import { StyleSheet, View, FlatList } from 'react-native';
+import JournalItem from './JournalItem';
+import AddJournalModal from '../AddJournalModal';
 
 const Journal: React.FC = () => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [isEditModalVisible, setEditModalVisible] = useState(false);
+  const [journalToEdit, setJournalToEdit] = useState<any>(null);
 
   const handlePress = (id: number) => {
     setExpandedId(prevId => (prevId === id ? null : id));
+  };
+
+  const handleEdit = (journal: any) => {
+    setJournalToEdit(journal);
+    setEditModalVisible(true);
+  };
+
+  const handleSaveJournal = (updatedJournal: any) => {
+    console.log("Journal updated:", updatedJournal);
+    setEditModalVisible(false);
   };
 
   const journalEntries = [
@@ -66,21 +39,32 @@ const Journal: React.FC = () => {
 ];
 
   return (
-    <FlatList
-      data={journalEntries}
-      renderItem={({ item }) => (
-        <JournalItem
-          id={item.id}
-          title={item.title}
-          content={item.content}
-          category={item.category}
-          date={item.date}
-          expanded={expandedId === item.id}
-          onToggleExpand={handlePress}
+    <View style={{ flex: 1 }}>
+      <FlatList
+        data={journalEntries}
+        renderItem={({ item }) => (
+          <JournalItem
+            id={item.id}
+            title={item.title}
+            content={item.content}
+            category={item.category}
+            date={item.date}
+            expanded={expandedId === item.id}
+            onToggleExpand={handlePress}
+            onEdit={() => handleEdit(item)}
+          />
+        )}
+        keyExtractor={item => item.id.toString()}
+      />
+      {journalToEdit && (
+        <AddJournalModal
+          isVisible={isEditModalVisible}
+          onClose={() => setEditModalVisible(false)}
+          onSave={handleSaveJournal}
+          journalToEdit={journalToEdit}
         />
       )}
-      keyExtractor={item => item.id.toString()}
-    />
+    </View>
   );
 };
 

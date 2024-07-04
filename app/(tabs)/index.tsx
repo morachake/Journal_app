@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
-import { StyleSheet, ScrollView, View, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-// import Calendar from '@/components/home/Calendar';
-import Journal from '@/components/home/Journal';
-import NavBar from '@/components/home/NavBar';
 import { FloatingAction } from 'react-native-floating-action';
+import { Ionicons } from '@expo/vector-icons';
+import NavBar from '@/components/home/NavBar';
 import AddJournalModal from '@/components/AddJournalModal';
 import AddCategoryModal from '@/components/AddCategoryModal';
-import { Ionicons } from '@expo/vector-icons';
+import Journal from '@/components/home/Journal';
+
+interface JournalEntry {
+  title: string;
+  content: string;
+  category: string;
+  date: string;
+}
+
 const actions = [
   {
     text: "New Journal",
@@ -24,18 +31,20 @@ const actions = [
 ];
 
 export default function HomeScreen() {
-  const [isJournalModalVisible, setJournalModalVisible] = useState(false);
-  const [isCategoryModalVisible, setCategoryModalVisible] = useState(false);
+  const [isJournalModalVisible, setJournalModalVisible] = useState<boolean>(false);
+  const [isCategoryModalVisible, setCategoryModalVisible] = useState<boolean>(false);
+  const [journalToEdit, setJournalToEdit] = useState<JournalEntry | null>(null);
 
   const handleActionPress = (name: string) => {
     if (name === "bt_add_journal") {
+      setJournalToEdit(null);
       setJournalModalVisible(true);
     } else if (name === "bt_add_category") {
       setCategoryModalVisible(true);
     }
   };
 
-  const handleSaveJournal = (journal: { title: string; content: string; category: string; date: string }) => {
+  const handleSaveJournal = (journal: JournalEntry) => {
     console.log("Journal saved:", journal);
     setJournalModalVisible(false);
   };
@@ -45,13 +54,17 @@ export default function HomeScreen() {
     setCategoryModalVisible(false);
   };
 
+  const handleEditJournal = (journal: JournalEntry) => {
+    setJournalToEdit(journal);
+    setJournalModalVisible(true);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <NavBar />
-        {/* <Calendar /> */}
-        <View style={styles.container}>
-          <Journal />
-        </View>
+      <View style={styles.container}>
+        <Journal />
+      </View>
       <FloatingAction
         actions={actions}
         onPressItem={handleActionPress}
@@ -61,6 +74,7 @@ export default function HomeScreen() {
         isVisible={isJournalModalVisible}
         onClose={() => setJournalModalVisible(false)}
         onSave={handleSaveJournal}
+        journalToEdit={journalToEdit}
       />
       <AddCategoryModal
         isVisible={isCategoryModalVisible}
@@ -72,16 +86,8 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
   container: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 3,

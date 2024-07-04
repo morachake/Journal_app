@@ -1,16 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TextInput, Button, StyleSheet } from 'react-native';
+
+interface Journal {
+  title: string;
+  content: string;
+  category: string;
+  date: string;
+}
 
 interface AddJournalModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSave: (journal: { title: string; content: string; category: string; date: string }) => void;
+  onSave: (journal: Journal) => void;
+  journalToEdit?: Journal | null;
 }
 
-export default function AddJournalModal({ isVisible, onClose, onSave }: AddJournalModalProps) {
-  const [journal, setJournal] = useState({ title: '', content: '', category: '', date: '' });
+export default function AddJournalModal({ isVisible, onClose, onSave, journalToEdit }: AddJournalModalProps) {
+  const [journal, setJournal] = useState<Journal>({ title: '', content: '', category: '', date: '' });
 
-  const handleJournalChange = (key: string, value: string) => {
+  useEffect(() => {
+    if (journalToEdit) {
+      setJournal(journalToEdit);
+    } else {
+      setJournal({ title: '', content: '', category: '', date: '' });
+    }
+  }, [journalToEdit]);
+
+  const handleJournalChange = (key: keyof Journal, value: string) => {
     setJournal(prevState => ({ ...prevState, [key]: value }));
   };
 
@@ -28,7 +44,7 @@ export default function AddJournalModal({ isVisible, onClose, onSave }: AddJourn
     >
       <View style={styles.modalBackground}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Add Journal</Text>
+          <Text style={styles.modalTitle}>Edit Journal</Text>
           <TextInput
             style={styles.input}
             placeholder="Title"

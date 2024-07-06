@@ -3,20 +3,28 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import Profile from '../screens/Profile';
+import { RouteProp } from '@react-navigation/native';
 
-const Tab = createBottomTabNavigator();
+type TabParamList = {
+  
+};
+
+const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function BottomTabs() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      screenOptions={({ route }: { route: RouteProp<TabParamList, keyof TabParamList> }) => ({
         headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+        tabBarIcon: ({ focused, color, size }: { focused: boolean; color: string; size: number }) => {
+          let iconName: keyof typeof Ionicons.glyphMap;
+
           if (route.name === 'Home') {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
+          } else if (route.name === 'Journal') {
+            iconName = focused ? 'book' : 'book-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;

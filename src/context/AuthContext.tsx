@@ -9,6 +9,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   signup: (username: string, email: string, password: string) => Promise<void>;
@@ -34,6 +35,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -42,6 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(JSON.parse(storedUser));
         setIsAuthenticated(true);
       }
+      setIsLoading(false);
     };
     checkUser();
   }, []);
@@ -88,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, signup, editProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, signup, editProfile }}>
       {children}
     </AuthContext.Provider>
   );

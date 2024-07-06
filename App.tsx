@@ -1,15 +1,14 @@
-import {View, Text, SafeAreaView } from 'react-native';
 import React from 'react';
-import BottomTabs from './src/navigation/BottomTabs';
 import { NavigationContainer } from '@react-navigation/native';
+import { AuthProvider } from './src/context/AuthContext';
+import BaseNavigation from './src/navigation/BaseNavigation';
+
 export default function App() {
-  
- 
-    
   return (
-    <NavigationContainer>
-      <BottomTabs/>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <BaseNavigation />
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
-

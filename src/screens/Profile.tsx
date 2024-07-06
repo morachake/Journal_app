@@ -1,27 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EvilIcons } from '@expo/vector-icons';
 import EditProfileModal from '../components/home/EditProfile';
+import { useAuth } from '../context/AuthContext';
 
-
-interface ProfileProps {}
-
-export default function Profile () {
+export default function Profile() {
   const [isEditModalVisible, setEditModalVisible] = useState<boolean>(false);
+  const { user, editProfile, logout } = useAuth();
   const [profile, setProfile] = useState({
-    username: 'Jacob Moracha',
-    email: 'jacobmoracha@gmail.com',
+    username: user?.username || '',
+    email: user?.email || '',
   });
 
   const handleEditPress = () => {
     setEditModalVisible(true);
   };
 
-  const handleSaveProfile = (updatedProfile: { username: string; currentPassword: string; newPassword: string }) => {
-    console.log("Profile updated:", updatedProfile);
-    setProfile(prevProfile => ({ ...prevProfile, username: updatedProfile.username }));
-    setEditModalVisible(false);
+  const handleSaveProfile = async (updatedProfile: { username: string; email: string; currentPassword: string; newPassword: string }) => {
+    try {
+      await editProfile(updatedProfile.username, updatedProfile.email, updatedProfile.newPassword);
+      setProfile(prevProfile => ({ ...prevProfile, username: updatedProfile.username, email: updatedProfile.email }));
+      setEditModalVisible(false);
+    } catch (error) {
+      console.error("Profile update failed:", error);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
   };
 
   return (
@@ -40,17 +47,25 @@ export default function Profile () {
         <Text style={styles.label}>Email:</Text>
         <Text style={styles.value}>{profile.email}</Text>
       </View>
+      <View style={{ marginTop: 10 }}>
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={handleLogout}
+        >
+          <Text style={styles.logoutButtonText}>Log Out</Text>
+        </TouchableOpacity>
+      </View>
+
       <EditProfileModal
         isVisible={isEditModalVisible}
         onClose={() => setEditModalVisible(false)}
         onSave={handleSaveProfile}
         currentUsername={profile.username}
+        currentEmail={profile.email}
       />
     </SafeAreaView>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -85,5 +100,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginBottom: 10,
+  },
+  logoutButton: {
+    backgroundColor: '#FF5987',
+    borderRadius: 10,
+    height: 40,
+    width: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoutButtonText: {
+    color: '#FFF',
+    fontSize: 13,
   },
 });

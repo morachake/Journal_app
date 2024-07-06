@@ -16,7 +16,7 @@ interface AuthContextType {
   editProfile: (username: string, email: string, password: string) => Promise<void>;
 }
 
-const BASE_URL = 'http://127.0.0.1:8000/api/journal/';
+const BASE_URL = 'http://localhost:8000/api';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -40,7 +40,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkUser = async () => {
       const storedUser = await AsyncStorage.getItem('user');
-      if (storedUser) {
+      const storedToken = await AsyncStorage.getItem('access_token');
+      if (storedUser && storedToken) {
         setUser(JSON.parse(storedUser));
         setIsAuthenticated(true);
       }
@@ -50,44 +51,71 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (username: string, password: string) => {
-    const response = await fetch(`${BASE_URL}/login/`, {
+    const response = await fetch(`${BASE_URL}/journal/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
     });
     const data = await response.json();
-    setUser(data.user);
-    setIsAuthenticated(true);
-    await AsyncStorage.setItem('user', JSON.stringify(data.user));
+
+    if (response.ok) {
+      const { access, refresh } = data;
+      setUser({ username, email: '' }); // email can be updated if needed
+      setIsAuthenticated(true);
+      await AsyncStorage.setItem('user', JSON.stringify({ username, email: '' }));
+      await AsyncStorage.setItem('access_token', access);
+      await AsyncStorage.setItem('refresh_token', refresh);
+    } else {
+      throw new Error('Login failed');
+    }
   };
 
   const logout = async () => {
     setUser(null);
     setIsAuthenticated(false);
     await AsyncStorage.removeItem('user');
+    await AsyncStorage.removeItem('access_token');
+    await AsyncStorage.removeItem('refresh_token');
   };
 
   const signup = async (username: string, email: string, password: string) => {
-    const response = await fetch(`${BASE_URL}/register/`, {
+    const response = await fetch(`${BASE_URL}/journal/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, email, password }),
     });
     const data = await response.json();
-    setUser(data.user);
-    setIsAuthenticated(true);
-    await AsyncStorage.setItem('user', JSON.stringify(data.user));
+
+    if (response.ok) {
+      const { access, refresh } = data;
+      setUser({ username, email });
+      setIsAuthenticated(true);
+      await AsyncStorage.setItem('user', JSON.stringify({ username, email }));
+      await AsyncStorage.setItem('access_token', access);
+      await AsyncStorage.setItem('refresh_token', refresh);
+    } else {
+      throw new Error('Signup failed');
+    }
   };
 
   const editProfile = async (username: string, email: string, password: string) => {
-    const response = await fetch(`${BASE_URL}/profile/`, {
+    const token = await AsyncStorage.getItem('access_token');
+    const response = await fetch(`${BASE_URL}/journal/profile/`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({ username, email, password }),
     });
     const data = await response.json();
-    setUser(data.user);
-    await AsyncStorage.setItem('user', JSON.stringify(data.user));
+
+    if (response.ok) {
+      setUser({ username, email });
+      await AsyncStorage.setItem('user', JSON.stringify({ username, email }));
+    } else {
+      throw new Error('Edit profile failed');
+    }
   };
 
   return (

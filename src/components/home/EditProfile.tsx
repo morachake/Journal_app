@@ -4,21 +4,24 @@ import { Modal, View, Text, TextInput, Button, StyleSheet } from 'react-native';
 interface EditProfileModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSave: (profile: { username: string; currentPassword: string; newPassword: string }) => void;
+  onSave: (profile: { username: string; email: string; currentPassword: string; newPassword: string }) => void;
   currentUsername: string;
+  currentEmail: string;
 }
 
-const EditProfileModal: React.FC<EditProfileModalProps> = ({ isVisible, onClose, onSave, currentUsername }) => {
+const EditProfileModal: React.FC<EditProfileModalProps> = ({ isVisible, onClose, onSave, currentUsername, currentEmail }) => {
   const [username, setUsername] = useState(currentUsername);
+  const [email, setEmail] = useState(currentEmail);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
   useEffect(() => {
     setUsername(currentUsername);
-  }, [currentUsername]);
+    setEmail(currentEmail);
+  }, [currentUsername, currentEmail]);
 
   const handleSave = () => {
-    onSave({ username, currentPassword, newPassword });
+    onSave({ username, email, currentPassword, newPassword });
     setCurrentPassword('');
     setNewPassword('');
   };
@@ -38,6 +41,12 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ isVisible, onClose,
             placeholder="Username"
             value={username}
             onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
           />
           <TextInput
             style={styles.input}

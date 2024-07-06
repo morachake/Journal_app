@@ -1,13 +1,20 @@
-import  { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { useAuth } from '@/src/context/AuthContext';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Login() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const { login } = useAuth();
 
-  const handleLogin = () => {
-    console.log("Login attempted with username:", username, "and password:", password);
+  const handleLogin = async () => {
+    try {
+      await login(username, password);
+      console.log("Login successful");
+    } catch (error) {
+      console.error("Login failed", error);
+    }
   };
 
   return (
@@ -27,7 +34,6 @@ export default function Login() {
           secureTextEntry
           onChangeText={setPassword}
         />
-        
       </View>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>

@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EvilIcons } from '@expo/vector-icons';
-import EditProfileModal from '@/components/home/EditProfile';
+import EditProfileModal from '../components/home/EditProfile';
 
 
 interface ProfileProps {}
 
-const Profile: React.FC<ProfileProps> = () => {
+export default function Profile () {
   const [isEditModalVisible, setEditModalVisible] = useState<boolean>(false);
   const [profile, setProfile] = useState({
     username: 'Jacob Moracha',
@@ -50,7 +50,7 @@ const Profile: React.FC<ProfileProps> = () => {
   );
 }
 
-export default Profile;
+
 
 const styles = StyleSheet.create({
   container: {

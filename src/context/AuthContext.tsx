@@ -99,25 +99,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const editProfile = async (username: string, email: string, password: string) => {
+  const editProfile = async (username?: string, email?: string, password?: string) => {
     const token = await AsyncStorage.getItem('access_token');
+    const body: any = {};
+    if (username) body.username = username;
+    if (email) body.email = email;
+    if (password) body.password = password;
+  
     const response = await fetch(`${BASE_URL}/journal/profile/`, {
       method: 'PUT',
       headers: { 
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ username, email, password }),
+      body: JSON.stringify(body),
     });
-    const data = await response.json();
-
+  
     if (response.ok) {
-      setUser({ username, email });
-      await AsyncStorage.setItem('user', JSON.stringify({ username, email }));
+      const data = await response.json();
+      setUser({ username: data.username, email: data.email });
+      await AsyncStorage.setItem('user', JSON.stringify({ username: data.username, email: data.email }));
     } else {
-      throw new Error('Edit profile failed');
+      const errorData = await response.json();
+      throw new Error(errorData.detail || 'Edit profile failed');
     }
   };
+  
 
   const getAccessToken = async () => {
     return await AsyncStorage.getItem('access_token');

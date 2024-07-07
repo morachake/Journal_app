@@ -1,11 +1,7 @@
+import { AddCategoryModalProps } from '@/src/types/types';
 import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
-interface AddCategoryModalProps {
-  isVisible: boolean;
-  onClose: () => void;
-  onSave: (category: string) => void;
-}
 
 export default function AddCategoryModal({ isVisible, onClose, onSave }: AddCategoryModalProps) {
   const [category, setCategory] = useState('');

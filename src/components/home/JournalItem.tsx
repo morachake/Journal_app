@@ -1,26 +1,17 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Modal, ActivityIndicator, Button } from 'react-native';
 import { Entypo, Ionicons, AntDesign } from '@expo/vector-icons';
+import { JournalItemProps } from '@/src/types/types';
 
-interface JournalItemProps {
-  id: number;
-  title: string;
-  content: string;
-  category_name: string;
-  date: string;
-  expanded: boolean;
-  onToggleExpand: (id: number) => void;
-  onEdit: () => void;
-  onDelete: (id: number) => void;
-}
+
 
 const JournalItem: React.FC<JournalItemProps> = ({ id, title, content, category_name, date, expanded, onToggleExpand, onEdit, onDelete }) => {
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     setIsLoading(true);
-    await onDelete(id);
+    onDelete(id);
     setIsLoading(false);
     setDeleteModalVisible(false);
   };

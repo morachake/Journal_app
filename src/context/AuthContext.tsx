@@ -1,21 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContextType, User } from '../types/types';
 
-interface User {
-  username: string;
-  email: string;
-}
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
-  signup: (username: string, email: string, password: string) => Promise<void>;
-  editProfile: (username: string, email: string, password: string) => Promise<void>;
-  getAccessToken: () => Promise<string | null>;
-}
 
 const BASE_URL = 'http://localhost:8000/api';
 
@@ -61,7 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     if (response.ok) {
       const { access, refresh } = data;
-      setUser({ username, email: '' }); // email can be updated if needed
+      setUser({ username, email: '' }); 
       setIsAuthenticated(true);
       await AsyncStorage.setItem('user', JSON.stringify({ username, email: '' }));
       await AsyncStorage.setItem('access_token', access);

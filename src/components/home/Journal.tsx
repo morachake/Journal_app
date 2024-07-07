@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, FlatList } from 'react-native';
+import { StyleSheet, View, FlatList, Button } from 'react-native';
 import JournalItem from './JournalItem';
 import AddJournalModal from './AddJournalModal';
 import { useJournal } from '@/src/context/JournalContext';
 
 const Journal: React.FC = () => {
-  const { journalEntries, fetchJournals, categories, fetchCategories, updateJournal, addJournal } = useJournal();
+  const { journalEntries, fetchJournals, categories, fetchCategories, updateJournal, addJournal, deleteJournal } = useJournal();
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [journalToEdit, setJournalToEdit] = useState<any>(null);
@@ -44,6 +44,15 @@ const Journal: React.FC = () => {
     }
   };
 
+  const handleDeleteJournal = async (id: number) => {
+    try {
+      await deleteJournal(id);
+      fetchJournals();
+    } catch (error) {
+      console.error("Failed to delete journal:", error);
+    }
+  };
+
   return (
     <>
       <FlatList
@@ -58,6 +67,7 @@ const Journal: React.FC = () => {
             expanded={expandedId === item.id}
             onToggleExpand={handlePress}
             onEdit={() => handleEdit(item)}
+            onDelete={handleDeleteJournal}
           />
         )}
         keyExtractor={item => item.id.toString()}

@@ -1,6 +1,6 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import { Entypo, Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Modal, ActivityIndicator, Button } from 'react-native';
+import { Entypo, Ionicons, AntDesign } from '@expo/vector-icons';
 
 interface JournalItemProps {
   id: number;
@@ -11,9 +11,20 @@ interface JournalItemProps {
   expanded: boolean;
   onToggleExpand: (id: number) => void;
   onEdit: () => void;
+  onDelete: (id: number) => void;
 }
 
-const JournalItem: React.FC<JournalItemProps> = ({ id, title, content, category_name, date, expanded, onToggleExpand, onEdit }) => {
+const JournalItem: React.FC<JournalItemProps> = ({ id, title, content, category_name, date, expanded, onToggleExpand, onEdit, onDelete }) => {
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+    await onDelete(id);
+    setIsLoading(false);
+    setDeleteModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -32,7 +43,7 @@ const JournalItem: React.FC<JournalItemProps> = ({ id, title, content, category_
           />
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.body}>
         <Text style={styles.journalTitle}>{title}</Text>
         <Text
@@ -42,6 +53,32 @@ const JournalItem: React.FC<JournalItemProps> = ({ id, title, content, category_
           {content}
         </Text>
       </View>
+      <TouchableOpacity onPress={() => setDeleteModalVisible(true)} style={styles.deleteButton}>
+        <AntDesign name="delete" size={24} color="#FF5987" />
+      </TouchableOpacity>
+
+      {/* Confirm Delete Modal */}
+      <Modal
+        visible={isDeleteModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Confirm Delete</Text>
+            <Text style={styles.modalMessage}>Are you sure you want to delete this journal entry?</Text>
+            {isLoading ? (
+              <ActivityIndicator size="large" color="#FF5987" />
+            ) : (
+              <View style={styles.modalActions}>
+                <Button title="Cancel" onPress={() => setDeleteModalVisible(false)} />
+                <Button title="Delete" onPress={handleDelete} />
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -99,5 +136,36 @@ const styles = StyleSheet.create({
   expandButton: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  deleteButton: {
+    position: 'absolute',
+    right: 15,
+    bottom: 15,
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });

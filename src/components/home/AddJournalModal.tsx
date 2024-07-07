@@ -1,38 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { Calendar } from 'react-native-calendars';
+import { Dropdown } from 'react-native-element-dropdown';
 
-interface Journal {
+interface JournalEntry {
+  id?: number;
   title: string;
   content: string;
-  category: string;
+  category: number;
   date: string;
 }
 
 interface AddJournalModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onSave: (journal: Journal) => void;
-  journalToEdit?: Journal | null;
+  onSave: (journal: JournalEntry) => void;
+  journalToEdit?: JournalEntry | null;
+  categories: { id: number; name: string }[];
 }
 
-export default function AddJournalModal({ isVisible, onClose, onSave, journalToEdit }: AddJournalModalProps) {
-  const [journal, setJournal] = useState<Journal>({ title: '', content: '', category: '', date: '' });
+export default function AddJournalModal({ isVisible, onClose, onSave, journalToEdit, categories }: AddJournalModalProps) {
+  const [journal, setJournal] = useState<JournalEntry>({ title: '', content: '', category: categories[0]?.id || 0, date: '' });
+  const [isCalendarVisible, setCalendarVisible] = useState(false);
 
   useEffect(() => {
     if (journalToEdit) {
       setJournal(journalToEdit);
     } else {
-      setJournal({ title: '', content: '', category: '', date: '' });
+      setJournal({ title: '', content: '', category: categories[0]?.id || 0, date: '' });
     }
-  }, [journalToEdit]);
+  }, [journalToEdit, categories]);
 
-  const handleJournalChange = (key: keyof Journal, value: string) => {
+  const handleJournalChange = (key: keyof JournalEntry, value: any) => {
     setJournal(prevState => ({ ...prevState, [key]: value }));
   };
 
   const handleSave = () => {
     onSave(journal);
-    setJournal({ title: '', content: '', category: '', date: '' });
+    setJournal({ title: '', content: '', category: categories[0]?.id || 0, date: '' });
+  };
+
+  const handleDateSelect = (day: { dateString: string }) => {
+    handleJournalChange('date', day.dateString);
+    setCalendarVisible(false);
   };
 
   return (
@@ -44,7 +54,7 @@ export default function AddJournalModal({ isVisible, onClose, onSave, journalToE
     >
       <View style={styles.modalBackground}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Edit Journal</Text>
+          <Text style={styles.modalTitle}>Add/Edit Journal</Text>
           <TextInput
             style={styles.input}
             placeholder="Title"
@@ -57,18 +67,27 @@ export default function AddJournalModal({ isVisible, onClose, onSave, journalToE
             value={journal.content}
             onChangeText={(text) => handleJournalChange('content', text)}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Category"
+          <Dropdown
+            data={categories}
+            labelField="name"
+            valueField="id"
+            placeholder="Select Category"
             value={journal.category}
-            onChangeText={(text) => handleJournalChange('category', text)}
+            onChange={item => handleJournalChange('category', item.id)}
+            style={styles.input}
           />
           <TextInput
             style={styles.input}
-            placeholder="Date"
+            placeholder="Date (YYYY-MM-DD)"
             value={journal.date}
-            onChangeText={(text) => handleJournalChange('date', text)}
+            onFocus={() => setCalendarVisible(true)}
           />
+          {isCalendarVisible && (
+            <Calendar
+              onDayPress={handleDateSelect}
+              markedDates={{ [journal.date]: { selected: true } }}
+            />
+          )}
           <Button title="Save" onPress={handleSave} />
           <Button title="Cancel" onPress={onClose} />
         </View>

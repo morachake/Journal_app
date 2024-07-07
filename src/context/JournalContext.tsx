@@ -5,7 +5,7 @@ interface JournalEntry {
   id: number;
   title: string;
   content: string;
-  category: string;
+  category: number;
   date: string;
 }
 
@@ -25,7 +25,7 @@ interface JournalContextType {
   fetchCategories: () => Promise<void>;
 }
 
-const BASE_URL = 'http://127.0.0.1:8000/api/journal';
+const BASE_URL = 'http://localhost:8000/api/journal';
 
 const JournalContext = createContext<JournalContextType | undefined>(undefined);
 
@@ -44,34 +44,47 @@ interface JournalProviderProps {
 export const JournalProvider: React.FC<JournalProviderProps> = ({ children }) => {
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, getAccessToken } = useAuth();
+
+  const getHeaders = async () => {
+    const token = await getAccessToken();
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
 
   const fetchJournals = async () => {
-    const response = await fetch(`${BASE_URL}/entries/`);
+    const headers = await getHeaders();
+    const response = await fetch(`${BASE_URL}/entries/`, { headers });
     const data = await response.json();
     setJournalEntries(data);
   };
 
   const fetchCategories = async () => {
-    const response = await fetch(`${BASE_URL}/categories/`);
+    const headers = await getHeaders();
+    const response = await fetch(`${BASE_URL}/categories/`, { headers });
     const data = await response.json();
     setCategories(data);
   };
 
   const addJournal = async (entry: JournalEntry) => {
+    const headers = await getHeaders();
     const response = await fetch(`${BASE_URL}/entries/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(entry),
     });
     const data = await response.json();
+    console.log(data);
     setJournalEntries([...journalEntries, data]);
   };
 
   const updateJournal = async (updatedEntry: JournalEntry) => {
+    const headers = await getHeaders();
     const response = await fetch(`${BASE_URL}/entries/${updatedEntry.id}/`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(updatedEntry),
     });
     const data = await response.json();
@@ -81,20 +94,29 @@ export const JournalProvider: React.FC<JournalProviderProps> = ({ children }) =>
   };
 
   const deleteJournal = async (id: number) => {
+    const headers = await getHeaders();
     await fetch(`${BASE_URL}/entries/${id}/`, {
       method: 'DELETE',
+      headers,
     });
     setJournalEntries(prevEntries => prevEntries.filter(entry => entry.id !== id));
   };
 
   const addCategory = async (category: string) => {
+    const headers = await getHeaders();
     const response = await fetch(`${BASE_URL}/categories/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ name: category }),
     });
-    const data = await response.json();
-    setCategories([...categories, data]);
+    if (response.ok) {
+      const data = await response.json();
+      setCategories([...categories, data]);
+    } else {
+      const errorData = await response.json();
+      console.error('Error adding category:', errorData);
+      throw new Error('Failed to add category');
+    }
   };
 
   useEffect(() => {

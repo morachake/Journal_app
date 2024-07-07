@@ -14,6 +14,7 @@ interface AuthContextType {
   logout: () => void;
   signup: (username: string, email: string, password: string) => Promise<void>;
   editProfile: (username: string, email: string, password: string) => Promise<void>;
+  getAccessToken: () => Promise<string | null>;
 }
 
 const BASE_URL = 'http://localhost:8000/api';
@@ -40,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkUser = async () => {
       const storedUser = await AsyncStorage.getItem('user');
-      const storedToken = await AsyncStorage.getItem('access_token');
+      const storedToken = await AsyncStorage.getItem('access');
       if (storedUser && storedToken) {
         setUser(JSON.parse(storedUser));
         setIsAuthenticated(true);
@@ -118,8 +119,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const getAccessToken = async () => {
+    return await AsyncStorage.getItem('access_token');
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, signup, editProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, login, logout, signup, editProfile, getAccessToken }}>
       {children}
     </AuthContext.Provider>
   );

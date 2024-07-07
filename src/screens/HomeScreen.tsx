@@ -5,17 +5,16 @@ import { FloatingAction } from 'react-native-floating-action';
 import { Ionicons } from '@expo/vector-icons';
 import NavBar from '../components/home/NavBar';
 import AddJournalModal from '../components/home/AddJournalModal';
-
 import Journal from '../components/home/Journal';
 import AddCategoryModal from '../components/home/AddCategoryModal';
+import { useJournal } from '../context/JournalContext';
 
 interface JournalEntry {
+  id?: number;
   title: string;
   content: string;
-  category: string;
+  category: number;
   date: string;
-  onPressItem : () => void;
-  onSave:  () => void;
 }
 
 const actions = [
@@ -37,6 +36,9 @@ export default function HomeScreen() {
   const [isJournalModalVisible, setJournalModalVisible] = useState<boolean>(false);
   const [isCategoryModalVisible, setCategoryModalVisible] = useState<boolean>(false);
   const [journalToEdit, setJournalToEdit] = useState<JournalEntry | null>(null);
+  const { addJournal, addCategory, updateJournal, categories } = useJournal();
+  
+  console.log({ categories });
 
   const handleActionPress = (name: string) => {
     if (name === "bt_add_journal") {
@@ -47,13 +49,17 @@ export default function HomeScreen() {
     }
   };
 
-  const handleSaveJournal = (journal: JournalEntry) => {
-    console.log("Journal saved:", journal);
+  const handleSaveJournal = async (journal: JournalEntry) => {
+    if (journal.id) {
+      await updateJournal(journal);
+    } else {
+      await addJournal(journal);
+    }
     setJournalModalVisible(false);
   };
 
-  const handleSaveCategory = (category: string) => {
-    console.log("Category saved:", category);
+  const handleSaveCategory = async (category: string) => {
+    await addCategory(category);
     setCategoryModalVisible(false);
   };
 
@@ -66,7 +72,7 @@ export default function HomeScreen() {
     <SafeAreaView style={{ flex: 1 }}>
       <NavBar />
       <View style={styles.container}>
-        <Journal />
+        <Journal onPressItem={handleEditJournal} />
       </View>
       <FloatingAction
         actions={actions}
@@ -78,6 +84,7 @@ export default function HomeScreen() {
         onClose={() => setJournalModalVisible(false)}
         onSave={handleSaveJournal}
         journalToEdit={journalToEdit}
+        categories={categories}
       />
       <AddCategoryModal
         isVisible={isCategoryModalVisible}

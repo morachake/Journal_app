@@ -5,13 +5,14 @@ import AddJournalModal from './AddJournalModal';
 import { useJournal } from '@/src/context/JournalContext';
 
 const Journal: React.FC = () => {
-  const { journalEntries, fetchJournals } = useJournal();
+  const { journalEntries, fetchJournals, categories, fetchCategories, updateJournal, addJournal } = useJournal();
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [journalToEdit, setJournalToEdit] = useState<any>(null);
 
   useEffect(() => {
     fetchJournals();
+    fetchCategories();
   }, []);
 
   const handlePress = (id: number) => {
@@ -19,13 +20,28 @@ const Journal: React.FC = () => {
   };
 
   const handleEdit = (journal: any) => {
-    setJournalToEdit(journal);
+    setJournalToEdit({
+      id: journal.id,
+      title: journal.title,
+      content: journal.content,
+      category: journal.category,
+      date: journal.date
+    });
     setEditModalVisible(true);
   };
 
-  const handleSaveJournal = (updatedJournal: any) => {
-    console.log("Journal updated:", updatedJournal);
-    setEditModalVisible(false);
+  const handleSaveJournal = async (journal: any) => {
+    try {
+      if (journal.id) {
+        await updateJournal(journal);
+      } else {
+        await addJournal(journal);
+      }
+      setEditModalVisible(false);
+      fetchJournals();
+    } catch (error) {
+      console.error("Failed to save journal:", error);
+    }
   };
 
   return (
@@ -37,7 +53,7 @@ const Journal: React.FC = () => {
             id={item.id}
             title={item.title}
             content={item.content}
-            category_name={item.category_name} // Pass category_name instead of category
+            category_name={item.category_name}
             date={item.date}
             expanded={expandedId === item.id}
             onToggleExpand={handlePress}
@@ -46,12 +62,13 @@ const Journal: React.FC = () => {
         )}
         keyExtractor={item => item.id.toString()}
       />
-      {journalToEdit && (
+      {isEditModalVisible && (
         <AddJournalModal
           isVisible={isEditModalVisible}
           onClose={() => setEditModalVisible(false)}
           onSave={handleSaveJournal}
           journalToEdit={journalToEdit}
+          categories={categories}
         />
       )}
     </>

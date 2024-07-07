@@ -26,8 +26,10 @@ export default function AddJournalModal({ isVisible, onClose, onSave, journalToE
   useEffect(() => {
     if (journalToEdit) {
       setJournal(journalToEdit);
+      console.log('Editing journal:', journalToEdit);
     } else {
       setJournal({ title: '', content: '', category: categories[0]?.id || 0, date: '' });
+      console.log('Creating new journal');
     }
   }, [journalToEdit, categories]);
 
@@ -54,7 +56,7 @@ export default function AddJournalModal({ isVisible, onClose, onSave, journalToE
     >
       <View style={styles.modalBackground}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Add/Edit Journal</Text>
+          <Text style={styles.modalTitle}>{journal.id ? "Edit Journal" : "Add Journal"}</Text>
           <TextInput
             style={styles.input}
             placeholder="Title"

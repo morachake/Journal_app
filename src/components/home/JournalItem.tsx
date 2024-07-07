@@ -6,14 +6,14 @@ interface JournalItemProps {
   id: number;
   title: string;
   content: string;
-  category: string;
+  category_name: string;
   date: string;
   expanded: boolean;
   onToggleExpand: (id: number) => void;
   onEdit: () => void;
 }
 
-const JournalItem: React.FC<JournalItemProps> = ({ id, title, content, category, date, expanded, onToggleExpand, onEdit }) => {
+const JournalItem: React.FC<JournalItemProps> = ({ id, title, content, category_name, date, expanded, onToggleExpand, onEdit }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -21,7 +21,7 @@ const JournalItem: React.FC<JournalItemProps> = ({ id, title, content, category,
           <Entypo name="pencil" size={24} color="#FF5987" style={styles.icon} />
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
-          <Text style={styles.dayText}>{category}</Text>
+          <Text style={styles.dayText}>{category_name}</Text>
           <Text style={styles.dateText}>{date}</Text>
         </View>
         <TouchableOpacity onPress={() => onToggleExpand(id)} style={styles.expandButton}>

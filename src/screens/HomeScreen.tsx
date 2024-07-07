@@ -71,9 +71,9 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <NavBar />
-      <View style={styles.container}>
+      {/* <View style={styles.container}> */}
         <Journal onPressItem={handleEditJournal} />
-      </View>
+      {/* </View> */}
       <FloatingAction
         actions={actions}
         onPressItem={handleActionPress}

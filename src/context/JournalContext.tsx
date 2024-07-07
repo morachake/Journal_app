@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface JournalEntry {
   id: number;
@@ -41,6 +42,7 @@ interface JournalProviderProps {
   children: ReactNode;
 }
 
+
 export const JournalProvider: React.FC<JournalProviderProps> = ({ children }) => {
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -55,8 +57,10 @@ export const JournalProvider: React.FC<JournalProviderProps> = ({ children }) =>
   };
 
   const fetchJournals = async () => {
-    const headers = await getHeaders();
-    const response = await fetch(`${BASE_URL}/entries/`, { headers });
+    const token = await AsyncStorage.getItem('access_token');
+    const response = await fetch(`${BASE_URL}/entries/`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
     const data = await response.json();
     setJournalEntries(data);
   };

@@ -1,13 +1,18 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
 import JournalItem from './JournalItem';
 import AddJournalModal from './AddJournalModal';
+import { useJournal } from '@/src/context/JournalContext';
 
 const Journal: React.FC = () => {
+  const { journalEntries, fetchJournals } = useJournal();
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [journalToEdit, setJournalToEdit] = useState<any>(null);
+
+  useEffect(() => {
+    fetchJournals();
+  }, []);
 
   const handlePress = (id: number) => {
     setExpandedId(prevId => (prevId === id ? null : id));
@@ -23,23 +28,8 @@ const Journal: React.FC = () => {
     setEditModalVisible(false);
   };
 
-  const journalEntries = [
-    { id: 1, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 2, title: 'Second Entry', content: 'Another journal entry content. This can also be very long and detailed to show the expanded functionality.', category: 'Work', date: 'Tuesday, July 16, 2023' },
-    { id: 3, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 4, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 5, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 6, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 7, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 8, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 9, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 10, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 11, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-    { id: 12, title: 'First Entry', content: 'Make food available for others to eat. This is an extended description to show how the text will look when the arrow is clicked and the content is expanded to reveal more details. The full content can be quite long, providing a comprehensive view of the journal entry.', category: 'Personal', date: 'Monday, July 15, 2023' },
-];
-
   return (
-    <View style={{ flex: 1 }}>
+    <>
       <FlatList
         data={journalEntries}
         renderItem={({ item }) => (
@@ -47,7 +37,7 @@ const Journal: React.FC = () => {
             id={item.id}
             title={item.title}
             content={item.content}
-            category={item.category}
+            category_name={item.category_name} // Pass category_name instead of category
             date={item.date}
             expanded={expandedId === item.id}
             onToggleExpand={handlePress}
@@ -64,7 +54,7 @@ const Journal: React.FC = () => {
           journalToEdit={journalToEdit}
         />
       )}
-    </View>
+    </>
   );
 };
 

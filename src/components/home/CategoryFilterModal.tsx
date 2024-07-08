@@ -32,7 +32,7 @@ const CategoryFilterModal: React.FC<CategoryFilterModalProps> = ({ isVisible, on
           <TouchableOpacity onPress={() => handleSelectCategory(null)} style={styles.categoryButton}>
             <Text style={styles.categoryText}>All</Text>
           </TouchableOpacity>
-          {categories.map(category => (
+          {categories?.map(category => (
             <TouchableOpacity key={category.id} onPress={() => handleSelectCategory(category.id)} style={styles.categoryButton}>
               <Text style={styles.categoryText}>{category.name}</Text>
             </TouchableOpacity>

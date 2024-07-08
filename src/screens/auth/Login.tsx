@@ -1,20 +1,38 @@
 import { useAuth } from '@/src/context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ToastAndroid } from 'react-native';
 
 export default function Login() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const { login } = useAuth();
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+
   const handleLogin = async () => {
+    if (!username || !password) {
+      const message = "Username and password cannot be empty";
+      if (Platform.OS === 'android') {
+        ToastAndroid.show(message, ToastAndroid.LONG);
+      } else {
+        Alert.alert("Validation Error", message);
+      }
+      return;
+    }
+
     try {
       await login(username, password);
       console.log("Login successful");
     } catch (error) {
       console.error("Login failed", error);
+      const message = "Login failed. Please check your credentials and try again.";
+      if (Platform.OS === 'android') {
+        ToastAndroid.show(message, ToastAndroid.LONG);
+      } else {
+        Alert.alert("Login Failed", message);
+      }
     }
   };
 
@@ -40,14 +58,11 @@ export default function Login() {
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
       <View>
-        <Text style={{ color: '#FF5987', marginTop: 10 }}>
-          
-        </Text>
         <TouchableOpacity onPress={() => Alert.alert('Reset Password')}>
           <Text style={{ color: '#FF5987', marginTop: 10 }}>Reset Password</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.signup} onPress={navigation.navigate("Register")}>
+      <TouchableOpacity style={styles.signup} onPress={() => navigation.navigate("Register")}>
         <Text style={{color:'#111'}}>SignUp</Text>
       </TouchableOpacity>
     </SafeAreaView>

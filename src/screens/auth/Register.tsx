@@ -1,15 +1,35 @@
+import { useAuth } from '@/src/context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ToastAndroid } from 'react-native';
 
 export default function Register() {
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const { signup } = useAuth();
+  const navigation = useNavigation();
 
-  const handleRegister = () => {
-    console.log("Register attempted with username:", username, "email:", email, "and password:", password);
-    // Implement your registration logic here
+  const handleRegister = async () => {
+    try {
+      await signup(username, email, password);
+      console.log("Registration successful");
+      if (Platform.OS === 'android') {
+        ToastAndroid.show("Registration successful", ToastAndroid.LONG);
+      } else {
+        Alert.alert("Registration Successful", "You can now log in.");
+      }
+      navigation.navigate("Login");
+    } catch (error) {
+      console.error("Registration failed", error);
+      if (Platform.OS === 'android') {
+        ToastAndroid.show("Registration failed", ToastAndroid.LONG);
+      } else {
+        Alert.alert("Registration Failed", error.message);
+      }
+    }
   };
 
   return (
@@ -38,6 +58,14 @@ export default function Register() {
       </View>
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
+      </TouchableOpacity>
+      <View>
+        <TouchableOpacity onPress={() => Alert.alert('Reset Password')}>
+          <Text style={{ color: '#FF5987', marginTop: 10 }}>Reset Password</Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.signup} onPress={() => navigation.navigate("Login")}>
+        <Text style={{color:'#111'}}>Login</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -74,6 +102,16 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 15,
     backgroundColor: '#FF5987',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  signup: {
+    width: '100%',
+    padding: 15,
+    color: '#FF5987',
+    borderWidth: 1,
+    borderColor: '#FF5987',
+    marginTop: 10,
     borderRadius: 10,
     alignItems: 'center',
   },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FloatingAction } from 'react-native-floating-action';
 import { Ionicons } from '@expo/vector-icons';
@@ -33,8 +33,8 @@ export default function HomeScreen() {
   const [journalToEdit, setJournalToEdit] = useState<JournalEntry | null>(null);
   const [filterPeriod, setFilterPeriod] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const { addJournal, addCategory, updateJournal, categories } = useJournal();
-  
+  const { addJournal, addCategory, updateJournal, categories, isLoading } = useJournal(); // Get isLoading state
+
   const handleActionPress = (name: string) => {
     if (name === "bt_add_journal") {
       setJournalToEdit(null);
@@ -70,6 +70,14 @@ export default function HomeScreen() {
   const handleSelectCategory = (categoryId: number | null) => {
     setSelectedCategory(categoryId);
   };
+
+  if (isLoading) { 
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#FF5987" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -134,6 +142,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  loadingContainer: { // Add styles for loading container
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterContainer: {
     flexDirection: 'row',

@@ -24,6 +24,7 @@ export default function AddJournalModal({ isVisible, onClose, onSave, journalToE
   const [isCalendarVisible, setCalendarVisible] = useState(false);
 
   useEffect(() => {
+    console.log('Categories:', categories);
     if (journalToEdit) {
       setJournal(journalToEdit);
       console.log('Editing journal:', journalToEdit);
@@ -38,6 +39,7 @@ export default function AddJournalModal({ isVisible, onClose, onSave, journalToE
   };
 
   const handleSave = () => {
+    console.log('Saving journal:', journal);
     onSave(journal);
     setJournal({ title: '', content: '', category: categories[0]?.id || 0, date: '' });
   };
@@ -75,7 +77,10 @@ export default function AddJournalModal({ isVisible, onClose, onSave, journalToE
             valueField="id"
             placeholder="Select Category"
             value={journal.category}
-            onChange={item => handleJournalChange('category', item.id)}
+            onChange={item => {
+              console.log('Selected category:', item);
+              handleJournalChange('category', item.id);
+            }}
             style={styles.input}
           />
           <TextInput

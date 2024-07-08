@@ -1,30 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-interface JournalEntry {
-  id: number;
-  title: string;
-  content: string;
-  category: number;
-  date: string;
-}
-
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface JournalContextType {
-  journalEntries: JournalEntry[];
-  categories: Category[];
-  addJournal: (entry: JournalEntry) => Promise<void>;
-  updateJournal: (updatedEntry: JournalEntry) => Promise<void>;
-  deleteJournal: (id: number) => Promise<void>;
-  addCategory: (category: string) => Promise<void>;
-  fetchJournals: () => Promise<void>;
-  fetchCategories: () => Promise<void>;
-}
+import { Category, JournalContextType, JournalEntry } from '../types/types';
 
 const BASE_URL = 'http://localhost:8000/api/journal';
 
@@ -42,10 +19,10 @@ interface JournalProviderProps {
   children: ReactNode;
 }
 
-
 export const JournalProvider: React.FC<JournalProviderProps> = ({ children }) => {
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true); // Add loading state
   const { isAuthenticated, getAccessToken } = useAuth();
 
   const getHeaders = async () => {
@@ -72,6 +49,13 @@ export const JournalProvider: React.FC<JournalProviderProps> = ({ children }) =>
     setCategories(data);
   };
 
+  const fetchData = async () => {
+    setIsLoading(true);
+    await fetchJournals();
+    await fetchCategories();
+    setIsLoading(false);
+  };
+
   const addJournal = async (entry: JournalEntry) => {
     const headers = await getHeaders();
     const response = await fetch(`${BASE_URL}/entries/`, {
@@ -80,7 +64,6 @@ export const JournalProvider: React.FC<JournalProviderProps> = ({ children }) =>
       body: JSON.stringify(entry),
     });
     const data = await response.json();
-    console.log(data);
     setJournalEntries([...journalEntries, data]);
   };
 
@@ -125,8 +108,7 @@ export const JournalProvider: React.FC<JournalProviderProps> = ({ children }) =>
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchJournals();
-      fetchCategories();
+      fetchData();
     }
   }, [isAuthenticated]);
 
@@ -139,7 +121,8 @@ export const JournalProvider: React.FC<JournalProviderProps> = ({ children }) =>
       deleteJournal,
       addCategory,
       fetchJournals,
-      fetchCategories
+      fetchCategories,
+      isLoading // Expose loading state
     }}>
       {children}
     </JournalContext.Provider>

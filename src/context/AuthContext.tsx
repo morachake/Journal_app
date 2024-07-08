@@ -24,7 +24,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
   useEffect(() => {
     const checkUser = async () => {
       const storedUser = await AsyncStorage.getItem('user');

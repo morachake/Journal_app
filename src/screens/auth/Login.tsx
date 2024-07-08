@@ -1,4 +1,5 @@
 import { useAuth } from '@/src/context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +8,7 @@ export default function Login() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const { login } = useAuth();
-
+  const navigation = useNavigation()
   const handleLogin = async () => {
     try {
       await login(username, password);
@@ -46,7 +47,7 @@ export default function Login() {
           <Text style={{ color: '#FF5987', marginTop: 10 }}>Reset Password</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.signup} onPress={handleLogin}>
+      <TouchableOpacity style={styles.signup} onPress={navigation.navigate("Register")}>
         <Text style={{color:'#111'}}>SignUp</Text>
       </TouchableOpacity>
     </SafeAreaView>

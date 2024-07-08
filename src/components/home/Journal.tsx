@@ -1,47 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, FlatList, Button } from 'react-native';
+import { StyleSheet, View, FlatList, Text } from 'react-native';
 import JournalItem from './JournalItem';
-import AddJournalModal from './AddJournalModal';
 import { useJournal } from '@/src/context/JournalContext';
+import { JournalEntry } from '@/src/types/types';
 
-const Journal: React.FC = () => {
-  const { journalEntries, fetchJournals, categories, fetchCategories, updateJournal, addJournal, deleteJournal } = useJournal();
+
+interface JournalProps {
+  onPressItem: (journal: JournalEntry) => void;
+  filterPeriod: string;
+  selectedCategory: number | null;
+}
+
+const Journal: React.FC<JournalProps> = ({ onPressItem, filterPeriod, selectedCategory }) => {
+  const { journalEntries, fetchJournals, categories, fetchCategories, updateJournal, addJournal, deleteJournal } = useJournal() as JournalContextType;
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [isEditModalVisible, setEditModalVisible] = useState(false);
-  const [journalToEdit, setJournalToEdit] = useState<any>(null);
+  const [filteredJournals, setFilteredJournals] = useState<JournalEntry[]>([]);
 
   useEffect(() => {
     fetchJournals();
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    filterJournals();
+  }, [journalEntries, filterPeriod, selectedCategory]);
+
+  const filterJournals = () => {
+    let filtered = journalEntries;
+    const now = new Date();
+
+    if (filterPeriod === 'today') {
+      filtered = journalEntries.filter(entry => new Date(entry.date).toDateString() === now.toDateString());
+    } else if (filterPeriod === 'week') {
+      const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+      filtered = journalEntries.filter(entry => new Date(entry.date) >= startOfWeek);
+    } else if (filterPeriod === 'month') {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      filtered = journalEntries.filter(entry => new Date(entry.date) >= startOfMonth);
+    }
+
+    if (selectedCategory !== null) {
+      filtered = filtered.filter(entry => entry.category === selectedCategory);
+    }
+
+    setFilteredJournals(filtered);
+  };
+
   const handlePress = (id: number) => {
     setExpandedId(prevId => (prevId === id ? null : id));
   };
 
-  const handleEdit = (journal: any) => {
-    setJournalToEdit({
-      id: journal.id,
-      title: journal.title,
-      content: journal.content,
-      category: journal.category,
-      date: journal.date
-    });
-    setEditModalVisible(true);
-  };
-
-  const handleSaveJournal = async (journal: any) => {
-    try {
-      if (journal.id) {
-        await updateJournal(journal);
-      } else {
-        await addJournal(journal);
-      }
-      setEditModalVisible(false);
-      fetchJournals();
-    } catch (error) {
-      console.error("Failed to save journal:", error);
-    }
+  const handleEdit = (journal: JournalEntry) => {
+    onPressItem(journal);
   };
 
   const handleDeleteJournal = async (id: number) => {
@@ -55,30 +65,27 @@ const Journal: React.FC = () => {
 
   return (
     <>
-      <FlatList
-        data={journalEntries}
-        renderItem={({ item }) => (
-          <JournalItem
-            id={item.id}
-            title={item.title}
-            content={item.content}
-            category_name={item.category_name}
-            date={item.date}
-            expanded={expandedId === item.id}
-            onToggleExpand={handlePress}
-            onEdit={() => handleEdit(item)}
-            onDelete={handleDeleteJournal}
-          />
-        )}
-        keyExtractor={item => item.id.toString()}
-      />
-      {isEditModalVisible && (
-        <AddJournalModal
-          isVisible={isEditModalVisible}
-          onClose={() => setEditModalVisible(false)}
-          onSave={handleSaveJournal}
-          journalToEdit={journalToEdit}
-          categories={categories}
+      {filteredJournals.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No journals found.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredJournals}
+          renderItem={({ item }) => (
+            <JournalItem
+              id={item.id}
+              title={item.title}
+              content={item.content}
+              category_name={item.category_name}
+              date={item.date}
+              expanded={expandedId === item.id}
+              onToggleExpand={handlePress}
+              onEdit={() => handleEdit(item)}
+              onDelete={handleDeleteJournal}
+            />
+          )}
+          keyExtractor={item => item.id.toString()}
         />
       )}
     </>
@@ -88,55 +95,13 @@ const Journal: React.FC = () => {
 export default Journal;
 
 const styles = StyleSheet.create({
-  container: {
-    borderColor: '#FF5987',
-    borderWidth: 1,
-    borderRadius: 19,
-    marginTop: 10,
-    width: '100%',
-    padding: 15,
-    backgroundColor: '#FFF5F8',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  icon: {
-    marginRight: 10,
-  },
-  headerTextContainer: {
+  emptyContainer: {
     flex: 1,
-  },
-  dayText: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: '600',
-  },
-  dateText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  body: {
-    marginTop: 10,
-  },
-  journalTitle: {
-    fontSize: 16,
-    color: '#FF5987',
-    fontWeight: '700',
-    marginBottom: 5,
-  },
-  journalContent: {
-    fontSize: 14,
-    color: '#333',
-  },
-  expandButton: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#666',
   },
 });

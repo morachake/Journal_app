@@ -4,21 +4,6 @@ export default function NavBar() {
     return (
         <View style={styles.container}>
             <Text style={{color:"#FFFF",fontSize:18}}>Journal</Text>
-            <View style={styles.cards}>
-                <TouchableOpacity style={styles.card}>
-                    <Text>Day</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.card}>
-                    <Text>Week</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.card}>
-                    <Text>Month</Text>
-                </TouchableOpacity>
-               
-            </View>
-            <View style={styles.filter}>
-                <AntDesign name="filter" size={24} color="black" />
-            </View>
         </View>
     )
 }

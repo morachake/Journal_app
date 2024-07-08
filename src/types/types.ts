@@ -8,6 +8,7 @@ export interface JournalEntry {
     date: string;
   }
   
+  
  export  interface JournalItemProps {
     id: number;
     title: string;

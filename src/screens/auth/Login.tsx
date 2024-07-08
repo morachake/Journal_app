@@ -38,6 +38,17 @@ export default function Login() {
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
+      <View>
+        <Text style={{ color: '#FF5987', marginTop: 10 }}>
+          
+        </Text>
+        <TouchableOpacity onPress={() => Alert.alert('Reset Password')}>
+          <Text style={{ color: '#FF5987', marginTop: 10 }}>Reset Password</Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.signup} onPress={handleLogin}>
+        <Text style={{color:'#111'}}>SignUp</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -73,6 +84,16 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 15,
     backgroundColor: '#FF5987',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  signup: {
+    width: '100%',
+    padding: 15,
+    color: '#FF5987',
+    borderWidth: 1,
+    borderColor: '#FF5987',
+    marginTop: 10,
     borderRadius: 10,
     alignItems: 'center',
   },
